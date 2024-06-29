@@ -49,10 +49,11 @@ __kernel void occupancy_discovery(__global atomic_uint* res,
                                   __global atomic_uint *now_serving,
                                   __global atomic_uint *next_ticket) {
     // Single represesentative thread from each workgroups runs the occupancy_discovery protocol
+    uint index;
     if (get_local_id(0) == 0) {
         get_occupancy(count, poll_open, M, now_serving, next_ticket);
     }
-    uint index = mapping[get_global_id(0)];
+    index = mapping[get_global_id(0)];
     for (uint i = 0; i < *iters; i++) {
         atomic_fetch_add_explicit(&res[index], 1, memory_order_relaxed);
     }

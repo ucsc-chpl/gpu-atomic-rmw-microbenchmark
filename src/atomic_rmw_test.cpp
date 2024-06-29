@@ -18,14 +18,14 @@ using easyvk::vkDeviceType;
 
 extern "C" void atomic_rmw_microbenchmark(easyvk::Device device, uint32_t contention, uint32_t padding) { 
 
-    uint32_t num_trials = 8;
+    uint32_t num_trials = 3;
     uint32_t workgroup_size = device.properties.limits.maxComputeWorkGroupInvocations;
     uint32_t workgroups = occupancy_discovery(device, workgroup_size, 256, get_spv_code("occupancy_discovery.cinit"), 3, 1024);
     uint32_t global_work_size = workgroup_size * workgroups;
     uint32_t buf_size = ((global_work_size) * padding) / contention;
     vector<uint32_t> spv_code = get_spv_code("atomic_fa_relaxed.cinit");
 
-    cout << '\n' << device.properties.deviceName << ": workgroups (" << workgroup_size << ", 1) x " << workgroups << endl;
+    cout << "\nRunning on " << device.properties.deviceName << ": workgroups (" << workgroup_size << ", 1) x " << workgroups << flush;
 
     Buffer result_buf = Buffer(device, buf_size, sizeof(uint32_t));
     Buffer rmw_iters_buf = Buffer(device, 1, sizeof(uint32_t));
@@ -54,8 +54,9 @@ extern "C" void atomic_rmw_microbenchmark(easyvk::Device device, uint32_t conten
         if ((total_duration/num_trials) < 1000000.0) {
             rmw_iters *= 2;
             rmw_program.teardown();
+            if ((total_duration/num_trials) > 50000.0) cout << "." << flush;
         } else {
-            cout << "contention " << contention << ", padding " << padding << ": " << total_rate / num_trials << " atomic operations per microsecond" << endl;
+            cout << "\ncontention " << contention << ", padding " << padding << ": " << (total_rate / num_trials) << " atomic operations per microsecond" << endl;
             rmw_program.teardown();
             break;
         }
@@ -71,7 +72,7 @@ extern "C" void atomic_rmw_microbenchmark(easyvk::Device device, uint32_t conten
 }
 
 int main() {
-    cout << "Atomic RMW Microbenchmark: Contiguous Access, Atomic_FA_Relaxed\n";
+    cout << "Atomic RMW Microbenchmark: Contiguous Access, Atomic_Fetch_Add\n\n";
     auto instance = easyvk::Instance(USE_VALIDATION_LAYERS);
 	auto physicalDevices = instance.physicalDevices();
 
@@ -84,8 +85,8 @@ int main() {
 
     auto selected_devices = select_configurations(device_options, "Select devices:");
 
-    uint32_t contention = get_params("Enter a value for Contention: ");
-    uint32_t padding = get_params("Enter a value for Padding: ");
+    uint32_t contention = get_params("\nEnter a value for contention: ");
+    uint32_t padding = get_params("Enter a value for padding: ");
 
     for (const auto& choice : selected_devices) {
         auto device = easyvk::Device(instance, physicalDevices.at(choice));
