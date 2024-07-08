@@ -17,6 +17,7 @@ using easyvk::Buffer;
 using easyvk::Program;
 using easyvk::vkDeviceType;
 
+// Validate output buffer with expected result at each atomic location
 uint32_t validate_kernel(easyvk::Buffer resultBuf, uint32_t rmw_iters, uint32_t num_trials, uint32_t contention, 
                             uint32_t padding, uint32_t size) {
     uint32_t error_count = 0;
@@ -30,6 +31,7 @@ uint32_t validate_kernel(easyvk::Buffer resultBuf, uint32_t rmw_iters, uint32_t 
     return error_count;
 }
 
+// Simple microbenchmark that performs atomic_fetch_add under a contiguous access pattern
 extern "C" void atomic_rmw_microbenchmark(easyvk::Device device, uint32_t contention, uint32_t padding, uint32_t workgroups, uint32_t rmw_iters) { 
 
     uint32_t num_trials = 3;
@@ -83,15 +85,15 @@ int main(int argc, char* argv[]) {
     auto instance = easyvk::Instance(USE_VALIDATION_LAYERS);
 	auto physicalDevices = instance.physicalDevices(); 
     uint32_t contention = 1, padding = 1, rmw_iters = 128;
-    uint32_t occupancy = 1;
+    uint32_t workgroups = 1;
     uint32_t selected_device = 0;
 
     if (argc == 1) {
-        cout << "Usage: program_name -o <occupancy> [-d <device>] [-c <contention>] [-p <padding>] [-i <rmw_iterations>]" << endl;
+        cout << "Usage: program_name -w <workgroups> [-d <device>] [-c <contention>] [-p <padding>] [-i <rmw_iterations>]" << endl;
         return 1;
     }
     int opt;
-    while ((opt = getopt(argc, argv, "c:p:o:d:i:")) != -1) {
+    while ((opt = getopt(argc, argv, "c:p:w:d:i:")) != -1) {
         switch (opt) {
             case 'c':
                 contention = static_cast<uint32_t>(stoi(optarg));
@@ -99,8 +101,8 @@ int main(int argc, char* argv[]) {
             case 'p':
                 padding = static_cast<uint32_t>(stoi(optarg));
                 break;
-            case 'o':
-                occupancy = static_cast<uint32_t>(stoi(optarg));
+            case 'w':
+                workgroups = static_cast<uint32_t>(stoi(optarg));
                 break;
             case 'd':
                 selected_device = static_cast<uint32_t>(stoi(optarg));
@@ -111,7 +113,7 @@ int main(int argc, char* argv[]) {
         }
     }
     auto device = easyvk::Device(instance, physicalDevices.at(selected_device));
-    atomic_rmw_microbenchmark(device, contention, padding, occupancy, rmw_iters);
+    atomic_rmw_microbenchmark(device, contention, padding, workgroups, rmw_iters);
     device.teardown();
     instance.teardown();
     return 0;
