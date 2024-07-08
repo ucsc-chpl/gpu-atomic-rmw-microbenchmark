@@ -1,3 +1,5 @@
 vk-output.txt
 *.cinit
 *.run
+result.txt
+heatmaps/

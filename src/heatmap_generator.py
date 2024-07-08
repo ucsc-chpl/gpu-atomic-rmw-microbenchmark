@@ -7,21 +7,6 @@ import matplotlib.patheffects as pe
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 
-def atomic_throughput(workgroups, device, contention, padding, iters):
-    result = subprocess.run(['./atomic_rmw_test.run', '-w '+str(workgroups), '-d '+str(device), '-c '+str(contention), 
-                            '-p '+str(padding), '-i '+str(iters)], capture_output=True, text=True)
-    match = re.search(r'Throughput: ([\d.]+) atomic operations per microsecond', result.stdout.strip())
-    if match:
-        return float(match.group(1))
-    else:
-        return 0
-
-def device_information(workgroups, device, iters):
-    result = subprocess.run(['./atomic_rmw_test.run', '-w '+str(workgroups), '-d '+str(device), '-c 1', 
-                            '-p 1', '-i '+str(iters)], capture_output=True, text=True)
-    match = re.search(r'Device: (.+), workgroups \((\d+), \d+\) x (\d+)', result.stdout.strip())
-    return f"{match.group(2)},{match.group(3)}:{match.group(1)}"
-
 def generate_heatmap(coordinates, title, filename):
     # workgroup and title extraction
     title_information = title.split(":", 1)
@@ -97,35 +82,35 @@ def generate_heatmap(coordinates, title, filename):
 
     plt.close()
 
-def main(workgroups, device, rmw_iterations):
-
-    title = device_information(workgroups, device, rmw_iterations) + ", contiguous_access: atomic_fa_relaxed"
-   
-    #Obtain results for different configurations of contention/padding
+def extract_coordinates_from_file(filename):
     coordinates = []
-    for contention in (2**i for i in range(0, 11)):
-        for padding in (2**i for i in range(0, 11)):
-            value = atomic_throughput(workgroups, device, contention, padding, rmw_iterations)
-            coordinates.append((contention, padding, value))
-            print("Contention: ", contention, "\tPadding: ", padding, "\tThroughput: ", value)
+    current_title = ""
 
+    with open(filename, 'r') as file:
+        for line in file:
+            if re.match(r"\(\d+, \d+, \d+.\d+\)", line):
+                parts = line.strip("()\n").split(", ")
+                x = int(parts[0])
+                y = int(parts[1])
+                value = float(parts[2])
+                coordinates.append((x, y, value))
+            else:
+                current_title = line.strip()
+
+    return coordinates, current_title
+
+def main():
     #Setup and generate heatmap
     plt.rcParams["font.serif"] = "cmr10, Computer Modern Serif, DejaVu Serif"
     plt.rcParams["font.family"] = "serif"
     plt.rcParams["axes.formatter.use_mathtext"] = True
     plt.rcParams["mathtext.fontset"] = "cm"
 
+    # File name
+    filename = "result.txt"
+    # Extract coordinates from the file
+    coordinates, title = extract_coordinates_from_file(filename)
     generate_heatmap(coordinates, title, "atomic_heatmap")
 
 if __name__ == "__main__":
-     if len(sys.argv) != 4:
-        print("Usage: python heatmap.py <workgroups> <device> <rmw_iterations>")
-        sys.exit(1)
-    
-    # Parse command-line arguments
-    workgroups = int(sys.argv[1])
-    device = int(sys.argv[2])
-    rmw_iterations = int(sys.argv[3])
-
-    # Call main function with parsed arguments
-    main(workgroups, device, rmw_iterations)
+    main()
