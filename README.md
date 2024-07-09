@@ -4,7 +4,7 @@
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
-- [Running Benchmarks](#running-benchmarks)
+- [Running Microbenchmark](#running-microbenchmark)
 
 ## Introduction
 This is a simple microbenchmark that calculates Atomic Read-Modify-Write (RMW) throughput. It allows you to configure various parameters such as contention, padding, RMW iterations, and the number of workgroups. You can also generate a heatmap of various combinations of contention and padding with the scripts provided.
@@ -35,16 +35,16 @@ To install the necessary dependencies, follow these steps:
     make
     ```
 
-## Running Benchmarks
-To run the benchmarks, execute the following series of commands:
+## Running Microbenchmark
+To run the microbenchmark, execute the following series of commands:
 
 ### Vulkan
 
 ```bash
 cd gpu-atomic-rmw-microbenchmark/src/
 make
-./atomic_rmw_test -w <workgroups> [-d <device>] [-c <contention>] [-p <padding>] [-i <rmw_iterations>] # test a single configuration
-./config_results.sh <workgroups> <device> <rmw_iterations> # test multiple configurations of contention and padding
+./atomic_rmw_test -w <workgroups> -d <device> -c <contention> -p <padding> -i <rmw_iterations> # test a single configuration
+./heatmap_results.sh <workgroups> <device> <rmw_iterations> # test multiple configurations of contention and padding
 python3 heatmap_generator.py # generate a heatmap displaying results
 ```
 
@@ -58,8 +58,8 @@ cp *.cinit *.sh build/android/obj/local/[SUPPORTED_CPU]
 adb -s [SERIAL_NUMBER] push build/android/obj/local/[SUPPORTED_CPU]/ /data/local/tmp/rmw
 adb -s [SERIAL_NUMBER] shell
   cd data/local/tmp/rmw/[SUPPORTED_CPU]
-  ./rmw_benchmark -w <workgroups> [-d <device>] [-c <contention>] [-p <padding>] [-i <rmw_iterations>]
-  sh config_results.sh <workgroups> <device> <rmw_iterations> # generates a text file of results needed if heatmap is generated
+  ./rmw_benchmark -w <workgroups> -d <device> -c <contention> -p <padding> -i <rmw_iterations>
+  sh heatmap_results.sh <workgroups> <device> <rmw_iterations> # generates a text file of results needed if heatmap is generated
   exit
 adb -s [SERIAL_NUMBER] pull /data/local/tmp/rmw/[SUPPORTED_CPU]/result.txt .
 python3 heatmap_generator.py
