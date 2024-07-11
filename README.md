@@ -83,13 +83,15 @@ To test multiple configurations of thread contention and padding and produce a h
     python3 heatmap_generator.py
     ```
   
-3. **Example heatmap generation**
-   For a **NVIDIA Geforce RTX 4070**, the following parameters work well:
+3. **Example heatmap generation**: <br>
+
+   For a NVIDIA Geforce RTX 4070, the following parameters work well:
    - `workgroups`: 46
-   - `rmw_iterations`: 4096
+   - `rmw_iterations`: 4096 
+   <br>
    <table>
       <tr>
-        <td><img src="https://drive.google.com/uc?id=1PDPJ38CIxa-k9hwPPcu487seezMP9NC6" alt="NVIDIA Geforce RTX 4070"></td>
+        <td><img src="https://drive.google.com/uc?id=1PDPJ38CIxa-k9hwPPcu487seezMP9NC6" alt="NVIDIA Geforce RTX 4070" width="500" ></td>
       </tr>
    </table>
 
@@ -172,12 +174,14 @@ To test multiple configurations of thread contention and padding and produce a h
     python3 heatmap_generator.py
     ```
   
-4. **Example heatmap generation**
-   For a **Samsung Xclipse 920**, the following parameters work well:
+4. **Example heatmap generation**: <br>
+
+   For a Samsung Xclipse 920, the following parameters work well:
    - `workgroups`: 3
    - `rmw_iterations`: 32768
+   <br>
    <table>
       <tr>
-        <td><img src="https://drive.google.com/uc?id=13v95qk-PKvnlzYIGcKBhaevXfGYU4DBH" alt="Samsung Xclipse 920"></td>
+        <td><img src="https://drive.google.com/uc?id=13v95qk-PKvnlzYIGcKBhaevXfGYU4DBH" alt="Samsung Xclipse 920" width="500" ></td>
       </tr>
    </table>
