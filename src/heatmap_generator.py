@@ -51,6 +51,11 @@ def generate_heatmap(coordinates, title, filename):
     ax.set_yticks(np.arange(len(y_ticks)))
     ax.set_yticklabels(y_ticks, fontsize=18)
 
+    for i in range(data_array.shape[0]):
+        for j in range(data_array.shape[1]):
+            text = ax.text(j, i, int(data_array[i][j]),
+               ha="center", va="center", color="w", fontsize=10, path_effects=[pe.withStroke(linewidth=1, foreground="black")])
+
     ax.invert_yaxis()  # Invert the y-axis
 
     description = title_information[1].split(", ")
