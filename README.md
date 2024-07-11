@@ -91,7 +91,7 @@ To test multiple configurations of thread contention and padding and produce a h
    <br>
    <table>
       <tr>
-        <td><img src="https://drive.google.com/uc?id=1PDPJ38CIxa-k9hwPPcu487seezMP9NC6" alt="NVIDIA Geforce RTX 4070" width="500" ></td>
+        <td><img src="https://drive.google.com/uc?id=1gt3wsocIOTxB7Xth3iclyIs880v4ojXz" alt="NVIDIA Geforce RTX 4070" width="500" ></td>
       </tr>
    </table>
 
